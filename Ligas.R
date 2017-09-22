@@ -6,20 +6,10 @@
 # library(sofa)
 library(jsonlite)
 
-# Los XML no jala muy bien así que eso lo
-# interpretaré a mano
 library(xml2)
 # YANO>> library(tcltk2)
 if (!exists("LEIDO.MiBiblioteca")) source("../RR/MiBiblioteca.R", chdir = T)
 
-
-# xx <- read_html("Mi_delicious.html")
-
-# xxc3 <- xml_children(
-#     xml_children(
-#         xml_children(xx)[[2]]
-#     )[[2]]
-# )
 
 doFlat <- function(elt) {
     # Aplana un elemento

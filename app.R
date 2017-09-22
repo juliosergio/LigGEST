@@ -65,7 +65,7 @@ ui <- fluidPage(
                   "Prueba tags",
                   "Modifica Registro",
                   "Elimina Registros",
-                  "Ve tabla completa"
+                  "Ver tabla completa"
                   )
             ),
             tags$hr(),
@@ -112,7 +112,8 @@ ui <- fluidPage(
             # width = 5
         ),
         mainPanel(
-            verbatimTextOutput("value")
+            # verbatimTextOutput("value")
+            dataTableOutput('value')
         )
     )
 )
@@ -122,28 +123,38 @@ server <- function(input, output) {
         strsplit(input$tags0, E_SepComma)[[1]]
     })
     vals <- eventReactive(input$go1, {
-        c(
-            input$op, "\n",
-            "fnam:" %,% input$fdat$name, "\n",
-            "fsize:" %,% input$fdat$size, "\n",
-            "ftype:" %,% input$fdat$type, "\n",
-            "fpath:" %,% input$fdat$datapath, "\n",
-            "-----------------", "\n",
-            "href:" %,% input$href, "\n",
-            "tit:" %,% input$tit, "\n",
-            "tags:" %,% input$tags, "\n",
-            "nota:" %,% input$nota, "\n",
-            "-----------------", "\n",
-            "hrefE:" %,% input$hrefE, "\n",
-            "titE:" %,% input$titE, "\n",
-            "tagsE:" %,% input$tagsE, "\n",
-            "notaE:" %,% input$notaE, "\n"
-         )
+        NULL # tabEdt
+        # c(
+        #     input$op, "\n",
+        #     "fnam:" %,% input$fdat$name, "\n",
+        #     "fsize:" %,% input$fdat$size, "\n",
+        #     "ftype:" %,% input$fdat$type, "\n",
+        #     "fpath:" %,% input$fdat$datapath, "\n",
+        #     "-----------------", "\n",
+        #     "href:" %,% input$href, "\n",
+        #     "tit:" %,% input$tit, "\n",
+        #     "tags:" %,% input$tags, "\n",
+        #     "nota:" %,% input$nota, "\n",
+        #     "-----------------", "\n",
+        #     "hrefE:" %,% input$hrefE, "\n",
+        #     "titE:" %,% input$titE, "\n",
+        #     "tagsE:" %,% input$tagsE, "\n",
+        #     "notaE:" %,% input$notaE, "\n",
+        #     "-----------------", "\n",
+        #     "selcols:" %,% paste(input$selcols, collapse = ", "), "\n",
+        #     "tbusc:" %,% input$tbusc, "\n",
+        #     "rgtxt:" %,% input$rgtxt, "\n",
+        #     "-----------------", "\n",
+        #     "tags0:" %,% input$tags0, "\n",
+        #     "iMask:" %,% paste(input$iMask, collapse = ", "), "\n",
+        #     "-----------------", "\n",
+        #     "regNum0" %,% input$regNum0, "\n"
+        #  )
     })
     
     # output$value <- renderText({">>" %,% dTags() %,% "<<"})
     
-    output$value <- renderText({vals()})
+    output$value <- renderDataTable(vals())
     output$oMask <- renderUI({
         tg <- dTags()
         vtn <- 1:length(tg)
