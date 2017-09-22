@@ -37,13 +37,13 @@ vtnams <- 1:length(cn)
 names(vtnams) <- cn
 
 
-groupTexts <- function(t0=tabIni) {
+groupTexts <- function(t0=tabIni, apnd="") {
     # Debe entregar el resultado como una lista
     lapply(
         1:nrow(t0), 
         function(i)
             with(t0[i,],
-                textInput(name, descr, value)
+                textInput(name %,% apnd, descr, value)
                 # print(paste(name, descr, value))
             )
     )
@@ -89,14 +89,14 @@ ui <- fluidPage(
                 numericInput("regNum","Número del registro:", value = 0, min = 0, max = maxR, step = 1),
                 conditionalPanel(
                     condition = "+input.regNum > 0",
-                    groupTexts(tabEdt)
+                    groupTexts(tabEdt, "E")
                 )
             ),
             conditionalPanel(
                 condition = "input.op == 'Prueba tags'",
                 fluidRow(
                     column(8, textInput("tags0","Tags, separados por \",\"")),
-                    column(2, br(), actionButton("go0", "Actualiza"))
+                    column(2, br(), actionButton("go0", "", icon = icon("check"))) #, lib="glyphicon")))
                 ),
                 uiOutput(
                     "oMask"
@@ -107,11 +107,12 @@ ui <- fluidPage(
                 textInput("regNum0","Números de registros separados por ','")
             ),
             # hr(),
-            wellPanel(actionButton("go3", "Ejecuta")),
-            width = 5
+            wellPanel(actionButton("go1", "Ejecuta")) 
+            #,
+            # width = 5
         ),
         mainPanel(
-            # verbatimTextOutput("value")
+            verbatimTextOutput("value")
         )
     )
 )
@@ -120,8 +121,29 @@ server <- function(input, output) {
     dTags <- eventReactive(input$go0, {
         strsplit(input$tags0, E_SepComma)[[1]]
     })
+    vals <- eventReactive(input$go1, {
+        c(
+            input$op, "\n",
+            "fnam:" %,% input$fdat$name, "\n",
+            "fsize:" %,% input$fdat$size, "\n",
+            "ftype:" %,% input$fdat$type, "\n",
+            "fpath:" %,% input$fdat$datapath, "\n",
+            "-----------------", "\n",
+            "href:" %,% input$href, "\n",
+            "tit:" %,% input$tit, "\n",
+            "tags:" %,% input$tags, "\n",
+            "nota:" %,% input$nota, "\n",
+            "-----------------", "\n",
+            "hrefE:" %,% input$hrefE, "\n",
+            "titE:" %,% input$titE, "\n",
+            "tagsE:" %,% input$tagsE, "\n",
+            "notaE:" %,% input$notaE, "\n"
+         )
+    })
     
-    #output$value <- renderText({">>" %,% dTags() %,% "<<"})
+    # output$value <- renderText({">>" %,% dTags() %,% "<<"})
+    
+    output$value <- renderText({vals()})
     output$oMask <- renderUI({
         tg <- dTags()
         vtn <- 1:length(tg)
