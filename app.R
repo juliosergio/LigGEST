@@ -4,10 +4,17 @@
 # 
 # ========================
 library(shiny)
+library(shinyjs)
+library(DT)
 if (!exists("LEIDO.MiBiblioteca")) source("../RR/MiBiblioteca.R", chdir = T)
 if (!exists("LEIDO.Intercala")) source("../RR/Intercala.R", chdir = T)
 source("Ligas.R")
 # debugSource("Ligas.R")
+
+# === Estructuras Globales ===
+MisLinks <- NULL # Tabla Global de Links
+subLinks <- NULL # Un fragmento de MisLinks
+displTable <- NULL # Tabla a desplegar
 
 
 #<-- DEFINICIONES
@@ -49,10 +56,33 @@ groupTexts <- function(t0=tabIni, apnd="") {
     )
 }
 
+ArmaJS_InSet <- function (elt, Set, eltIsJSVar = T) {
+    # Implementa una expresión en JavaScript
+    # para determinar si el elemento elt está
+    # en el conjunto Set. 
+    # ambos argumentos son strings y el resultado
+    # también.
+    encl <- if (eltIsJSVar) "" else "'"
+    "'" %,% Set %,% "'.match(RegExp(" %,% encl %,%
+        elt %,% encl %,%")) != null"
+}
+
+stylizedDT <- function(ddf, ...) {
+    datatable(ddf, 
+              options = list(scrollX=T, style='bootstrap'), ...)
+}
+
 # =====================================
 
 ui <- fluidPage(
-    h2(img(height=80, width=80*591/203, src="logoImtaM.png"),em(strong("LigGEST:"), "Administrador de links de la Web")),
+    useShinyjs(),  # Set up shinyjs
+    tags$head(tags$style("#dspTbl {white-space: nowrap;}")),
+    fluidRow(
+        column(4,img(height=80, width=80*591/203, src="logoImtaM.png")),
+        column(7,
+               h2(em(strong("LigGEST:"), "Administrador de links de la Web")),
+               offset = 0)
+    ),
     hr(),
     sidebarLayout(
         sidebarPanel(
@@ -60,6 +90,8 @@ ui <- fluidPage(
                 "op", "Operación",
                 c("", 
                   "Crea Archivo",
+                  "Lee Archivo",
+                  "Guarda Archivo",
                   "Agrega Registro",
                   "Busca en estructura",
                   "Prueba tags",
@@ -74,12 +106,19 @@ ui <- fluidPage(
                 fileInput("fdat","Archivo HTML",accept = c("text/html", "text/xml"))
             ),
             conditionalPanel(
+                condition = "input.op == 'Lee Archivo'",
+                fileInput("fdat0","Archivo rds",accept = c("application/rds", "application/RDS"))
+            ),
+            conditionalPanel(
+                condition = "input.op == 'Guarda Archivo'",
+                textInput("fnam", "Nombre Archivo(.rds)", "")
+            ),
+            conditionalPanel(
                 condition = "input.op == 'Agrega Registro'",
                 groupTexts()
             ),
             conditionalPanel(
                 condition = "input.op == 'Busca en estructura'",
-                # textInput("txt", "Columnas a buscar\n FMT:c(i,...) o *=todas :"),
                 checkboxGroupInput("selcols", "Columnas a buscar", vtnams, vtnams),
                 radioButtons("tbusc", "Tipo de búsqueda", c("Texto-simple"="txt", "Expr-regular"="rgexp")),
                 textInput("rgtxt", "RegExpr o Texto a buscar:")
@@ -106,24 +145,68 @@ ui <- fluidPage(
                 condition = "input.op == 'Elimina Registros'",
                 textInput("regNum0","Números de registros separados por ','")
             ),
-            # hr(),
-            wellPanel(actionButton("go1", "Ejecuta")) 
-            #,
-            # width = 5
+            conditionalPanel(
+                condition = "input.op != 'Guarda Archivo'",
+                wellPanel(actionButton("go1", "Ejecuta")) 
+            ),
+            conditionalPanel(
+                condition = "input.op == 'Guarda Archivo'",
+                wellPanel(downloadButton("downloadData", "Descarga Tabla"))
+            )
         ),
         mainPanel(
-            # verbatimTextOutput("value")
-            dataTableOutput('value')
+            dataTableOutput("dspTbl")
         )
     )
 )
 
 server <- function(input, output) {
+    
     dTags <- eventReactive(input$go0, {
         strsplit(input$tags0, E_SepComma)[[1]]
     })
-    vals <- eventReactive(input$go1, {
-        NULL # tabEdt
+    vv <- reactiveValues(Vop=NULL)
+    observeEvent(input$go1, {
+        # Vop(      # input$op)
+        # renderText(
+            print("Aquí toy")
+            op <- switch(
+                input$op, 
+                "Crea Archivo"="C",
+                "Lee Archivo"="L",
+                  #>>  "Guarda Archivo"="G",
+                "Agrega Registro"="A",
+                "Busca en estructura"="B",
+                "Prueba tags"="P",
+                "Modifica Registro"="M",
+                "Elimina Registros"="E",
+                "Ver tabla completa"="V"
+            )
+            switch (
+                op,
+                C = { # Crea la Tabla a partir de un HTML (tipo Delicious)
+                    MisLinks <<- creaDe_HTML(input$fdat$datapath)
+                    displTable <<- stylizedDT(MisLinks)
+                },
+                L = { # Crea la Tabla a partir de un archivo RDS
+                    MisLinks <<- readRDS(input$fdat0$datapath)
+                    displTable <<- stylizedDT(MisLinks)
+                }
+            )
+            vv$Vop <- displTable
+        #)
+        # output$tipo <- Vop()
+        # outputOptions(output, "tipo", suspendWhenHidden=F)
+    }) #, priority = 1)
+    observeEvent(input$fnam, {
+        print("Entré")
+        vv$Vop <- (displTable <<- stylizedDT(MisLinks))
+    })
+    # outputOptions(output, "tipo", suspendWhenHidden=F)
+    # vals <- eventReactive(input$go1, {
+        #">>>" %,% Vop() %,% "<<<"
+        # ">>>" %,% output$tipo %,% "<<<"
+        # tabEdt
         # c(
         #     input$op, "\n",
         #     "fnam:" %,% input$fdat$name, "\n",
@@ -150,24 +233,25 @@ server <- function(input, output) {
         #     "-----------------", "\n",
         #     "regNum0" %,% input$regNum0, "\n"
         #  )
-    })
+    #})
     
-    # output$value <- renderText({">>" %,% dTags() %,% "<<"})
-    
-    output$value <- renderDataTable(vals())
+    output$dspTbl <- renderDataTable(vv$Vop)
+
     output$oMask <- renderUI({
         tg <- dTags()
         vtn <- 1:length(tg)
         names(vtn) <- "__" %,% tg
         checkboxGroupInput("iMask", "Mascara", vtn, vtn)
     })
+    
+    output$downloadData <- downloadHandler(
+        filename = function () {
+                print("fnam>>" %,% input$fnam)
+                if (grepl("\\.rds$", input$fnam)) input$fnam else input$fnam %,% ".rds"
+            },
+        content = function(file) saveRDS(MisLinks, file)
+    )
 }
 
 shinyApp(ui = ui, server = server)
-
-
-
-
-
-
 

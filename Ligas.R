@@ -103,7 +103,13 @@ reTest <- function(SubTabla, expr) {
 }
 
 # =============== Visualizador de tablas ===========================
-
+#>>> EL SIGUIENTE CÓDIGO HA SIDO REMOVIDO PORQUE AL PARECER 
+#>>> LOS PAQUETES DE tk y tcl YA NO ESTÁN RECIBIENDO SOPORTE
+#>>> EN R.
+#>>> SIN EMBARGO, LO DEJO COMO ANOTACIÓN, DEBIDO AL USO QUE
+#>>> HACE DE LA SOBRECARGA DE OPERACIONES EN EL MODELO OO (S4)
+#>>> AL QUE SE HACE REFERENCIA.
+#>>> ===============================================================
 #>>> tclArrayVar <- function(x = NULL) {
 #>>>     # Check argument
 #>>>     if (!is.null(x) && !is.vector(x) && length(dim(x))!= 2)
@@ -162,6 +168,8 @@ reTest <- function(SubTabla, expr) {
 #>>>     l
 #>>> }
 #>>> 
+#>>>> EJEMPLO DE LA SOBRECARGA DE OPERACIONES:
+#
 #>>> # edit() generic function is defined in the utils package
 #>>> edit.tclArrayVar <- function(name, height = 20, width = 10) {
 #>>>     # library(tcltk2)
@@ -198,6 +206,7 @@ reTest <- function(SubTabla, expr) {
 #>>>     
 #>>> }
 #>>> 
+#>>> DEFINICION DE OPERACIONES DE EDICION
 #>>> `[.tclArrayVar` <- function(object, i, j = NULL) {
 #>>>     # library(tcltk2)
 #>>>     
