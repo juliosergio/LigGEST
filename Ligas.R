@@ -94,12 +94,26 @@ setTest <- function(inSet, TstSet, inMask=T, filterff=StandardText) {
 }
 
 
-reTest <- function(SubTabla, expr) {
+reTest <- function(SubTabla, expr, ...) {
     # OBJETIVO: Aplica a c/u de los elementos de la subtabla la expersión regular 'expr'
     #           y sumariza el resultado por renglones (con el operador 'or')
     # Una matriz uniforme
+    # el argumento "..." se pasa a grepl, tal cual
     mm <- sapply(SubTabla, as.character)
-    apply(mm, 1, function(e) Reduce(function(x,y) (x | grepl(expr,as.character(y))), e, init = F))
+    apply(mm, 1, function(e) Reduce(function(x,y) (x | grepl(expr,as.character(y), ...)), e, init = F))
+}
+
+crea1regDF <- function(descr, href, nota, tags) {
+    return (
+        data_frame(
+            descr    = descr,
+            href     = href,
+            add_date = Sys.time(),
+            note     = nota,
+            private  = "0",
+            tags     = tags
+        )
+    )
 }
 
 # =============== Visualizador de tablas ===========================
