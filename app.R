@@ -4,10 +4,10 @@
 # 
 # ========================
 library(shiny)
-library(shinyjs)
+# library(shinyjs)
 library(DT)
-if (!exists("LEIDO.MiBiblioteca")) source("../RR/MiBiblioteca.R", chdir = T)
-if (!exists("LEIDO.Intercala")) source("../RR/Intercala.R", chdir = T)
+source("MiniBiblioteca.R")
+# if (!exists("LEIDO.Intercala")) source("../RR/Intercala.R", chdir = T)
 source("Ligas.R")
 # debugSource("Ligas.R")
 
@@ -86,7 +86,7 @@ stylizedDT <- function(ddf, ...) {
 # =====================================
 
 ui <- fluidPage(
-    useShinyjs(),  # Set up shinyjs
+    # useShinyjs(),  # Set up shinyjs
     tags$head(tags$style("#dspTbl {white-space: nowrap;}")),
     fluidRow(
         column(4,img(height=80, width=80*591/203, src="logoImtaM.png")),
