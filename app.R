@@ -186,6 +186,7 @@ server <- function(input, output, session) {
         # Vop(      # input$op)
         # renderText(
         print("Aquí toy")
+        output$SubT <- renderText("NOTready")
         
         op <- switch(
             input$op, 
@@ -253,10 +254,18 @@ server <- function(input, output, session) {
                 displTable <<- stylizedDT(MisLinks)
             },
             E = { # Elimina registro(s)
-                ii <- as.integer(evalstr("c(" %,% input$regNum0 %,% ")"))
-                MisLinks <<- MisLinks[-ii,]
-                rownames(MisLinks) <<- 1:nrow(MisLinks)
-                displTable <<- stylizedDT(MisLinks)
+                # checamos la sintaxis de input$regNum0 por caracteres inválidos
+                if (chkSintx("[^[:digit:],:]", input$regNum0)) {
+                    showModal(modalDialog(
+                        title = "ERROR de entrada",
+                        "Secuencia inválida: intente de nuevo!"
+                    ))
+                } else {
+                    ii <- as.integer(evalstr("c(" %,% input$regNum0 %,% ")"))
+                    MisLinks <<- MisLinks[-ii,]
+                    rownames(MisLinks) <<- 1:nrow(MisLinks)
+                    displTable <<- stylizedDT(MisLinks)
+                }
             },
             V = { # Ver tabla completa
                 displTable <<- stylizedDT(MisLinks)
@@ -327,7 +336,7 @@ server <- function(input, output, session) {
     )
     output$downloadST <- downloadHandler(
         filename = function () {
-            "Res-" %,% Sys.Date() %,% ".rds"
+            "Res-" %,% sub(" ", "_", Sys.time()) %,% ".rds"
         },
         content = function(file) saveRDS(subLinks, file)
     )

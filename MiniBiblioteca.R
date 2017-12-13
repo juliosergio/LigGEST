@@ -3,11 +3,11 @@
 # ==========================
 
 # Variable para detectar que se ha leido Biblioteca:
-LEIDO.MiBiblioteca <- TRUE
+LEIDO.MiniBiblioteca <- TRUE
 
 library(dplyr)
 library(tidyr)
-library(stringdist)
+# library(stringdist)
 composite <- function(f,g) function(...) f(g(...))
 # como operador:
 `%cmp%` <- composite # Operador de composición de funciones

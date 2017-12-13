@@ -8,7 +8,7 @@ library(jsonlite)
 
 library(xml2)
 # YANO>> library(tcltk2)
-if (!exists("LEIDO.MiBiblioteca")) source("../RR/MiBiblioteca.R", chdir = T)
+source("MiniBiblioteca.R")
 
 
 doFlat <- function(elt) {
