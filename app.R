@@ -89,7 +89,7 @@ ui <- fluidPage(
     # useShinyjs(),  # Set up shinyjs
     tags$head(tags$style("#dspTbl {white-space: nowrap;}")),
     fluidRow(
-        column(4,img(height=80, width=80*591/203, src="logoImtaM.png")),
+        column(4,img(height=80, width=80*1358/671, src="SLogo.png")),
         column(7,
                h2(em(strong("LigGEST:"), "Administrador de links de la Web")),
                offset = 0)
@@ -207,6 +207,7 @@ server <- function(input, output, session) {
                 displTable <<- stylizedDT(MisLinks)
             },
             L = { # Crea la Tabla a partir de un archivo RDS
+                print("AQUI:" %,% input$fdat0$datapath)
                 MisLinks <<- readRDS(input$fdat0$datapath)
                 displTable <<- stylizedDT(MisLinks)
             },
@@ -276,7 +277,7 @@ server <- function(input, output, session) {
     })
     
     observeEvent(input$fnam, {
-        print("Entré")
+        # print("Entré")
         vv$Vop <- (displTable <<- stylizedDT(MisLinks))
     })
     

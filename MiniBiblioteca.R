@@ -268,6 +268,20 @@ E_anxIn <- "[^[:digit:]]*[[:digit:]]+[,.]([[:digit:]]+)[^[:digit:]]*"
 E_excInt <- "^[[:digit:]]+$"
 E_Fecha <- "^([[:digit:]]+-){2}[[:digit:]]+$"
 
+# Para que un patrón corresponda incluya exclusivamente todo el
+# string de prueba:
+Exclusivo <- function(s) paste0("^", s, "$")
+
+# PARA Lista de Números
+# Definición simple de un número
+E_Num <- "[[:blank:]]*-?[[:digit:]]+\\.?[[:digit:]]*[[:blank:]]*"
+
+# Lista de "algo" separada por comas
+
+E_list <- function(algo) paste0("(", algo, ",)*", algo)
+
+L_Num <- Exclusivo(E_list(E_Num)) # La lista
+
 sepElts <- ffun(strsplit, E_comaYbl_O_Yg)
 
 # ------------------------------------
