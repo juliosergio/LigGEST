@@ -89,7 +89,7 @@ ui <- fluidPage(
     # useShinyjs(),  # Set up shinyjs
     tags$head(tags$style("#dspTbl {white-space: nowrap;}")),
     fluidRow(
-        column(4,img(height=80, width=80*1358/671, src="SLogo.png")),
+        column(4,img(height=80, width=80*1430/572, src="StLogo.png")),
         column(7,
                h2(em(strong("LigGEST:"), "Administrador de links de la Web")),
                offset = 0)
